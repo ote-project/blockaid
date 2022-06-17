@@ -6,7 +6,6 @@ import edu.berkeley.cs.netsys.privacy_proxy.solver.context.Z3ContextWrapper;
 
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -14,7 +13,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 public abstract class PSJ<C extends Z3ContextWrapper<?, ?, ?, ?>> extends Query<C> {
     private final Schema<C> schema;
     private final List<String> relations;
-    private final Map<Instance<C>, Function<Tuple<C>, BoolExpr>> inst2DoesContainTemplate = new HashMap<>();
 
     @Override
     public Schema<C> getSchema() {

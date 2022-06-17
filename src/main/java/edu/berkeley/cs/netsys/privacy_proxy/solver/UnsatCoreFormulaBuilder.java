@@ -42,7 +42,7 @@ public class UnsatCoreFormulaBuilder<C extends Z3ContextWrapper<?, ?, ?, ?>, I e
         ).collect(ImmutableSet.toImmutableSet());
     }
 
-    public static record Formulas<L, BL>(
+    public record Formulas<L, BL>(
             ImmutableMap<L, BoolExpr> labeledExprs,
             ImmutableList<LabeledBoolExpr<BL>> background // Formula that is not under consideration for unsat core.
     ) {}

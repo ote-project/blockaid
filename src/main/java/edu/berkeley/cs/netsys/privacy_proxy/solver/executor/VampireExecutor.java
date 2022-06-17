@@ -1,7 +1,6 @@
 package edu.berkeley.cs.netsys.privacy_proxy.solver.executor;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ObjectArrays;
 
 import java.util.concurrent.CountDownLatch;
 

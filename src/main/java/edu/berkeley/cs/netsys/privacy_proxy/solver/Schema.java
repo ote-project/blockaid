@@ -173,10 +173,6 @@ public class Schema<C extends Z3ContextWrapper<?, ?, ?, ?>> {
         return instBuilder.buildBounded();
     }
 
-    public Instance<C> makeBoundedInstance(String instancePrefix, Map<String, Integer> bounds) {
-        return makeBoundedInstance(instancePrefix, bounds, null);
-    }
-
     public List<String> getRelationNames() {
         return rawSchema.getRelationNames();
     }

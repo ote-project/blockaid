@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import com.microsoft.z3.*;
 import edu.berkeley.cs.netsys.privacy_proxy.solver.context.Z3ContextWrapper;
 import edu.berkeley.cs.netsys.privacy_proxy.sql.*;
-import org.apache.calcite.sql.SqlKind;
 
 import java.util.*;
 

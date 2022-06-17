@@ -17,7 +17,6 @@ public abstract class ProcessSMTExecutor extends SMTExecutor {
     private final String smtString;
     private Process process = null;
     private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
-    protected String output = null;
 
     // Caches process builders by command.
     // TODO(zhangwen): Is a kludge.  We should just create one process builder per command.
@@ -33,7 +32,6 @@ public abstract class ProcessSMTExecutor extends SMTExecutor {
         this(name, smtString, s -> latch.countDown(), command, satConclusive, unsatConclusive, unknownConclusive, runCore);
     }
 
-    // Sets this.output.
     public String doRunRaw() {
         InputStream stderr = null;
         try {
@@ -62,10 +60,8 @@ public abstract class ProcessSMTExecutor extends SMTExecutor {
                 System.err.println(scanner.nextLine());
             }
 
-            this.output = output.toString();
-            return this.output;
+            return output.toString();
         } catch (InterruptedException e) {
-            this.output = null;
             return null;
         } catch (Exception e) {
             if (!(e instanceof IOException)) {
@@ -79,7 +75,6 @@ public abstract class ProcessSMTExecutor extends SMTExecutor {
                     System.err.println(scanner.nextLine());
                 }
             }
-            this.output = null;
             return null;
         }
     }
@@ -124,11 +119,7 @@ public abstract class ProcessSMTExecutor extends SMTExecutor {
         this.interrupt();
     }
 
-    public String getOutput() {
-        return output;
-    }
-
-    private Status getResult(String output) {
+    private static Status getResult(String output) {
         return switch (output.split("\n", 2)[0].trim()) {
             case "sat" -> Status.SATISFIABLE;
             case "unsat" -> Status.UNSATISFIABLE;

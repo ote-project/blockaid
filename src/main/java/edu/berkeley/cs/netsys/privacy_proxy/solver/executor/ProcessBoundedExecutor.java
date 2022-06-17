@@ -69,7 +69,7 @@ public class ProcessBoundedExecutor<C extends Z3ContextWrapper<?, ?, ?, ?>> exte
     }
 
     @Override
-    protected Status doRunUnsatCore() throws InterruptedException {
+    protected Status doRunUnsatCore() {
         throw new UnsupportedOperationException();
     }
 

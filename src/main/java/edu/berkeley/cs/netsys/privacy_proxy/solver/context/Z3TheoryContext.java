@@ -30,10 +30,9 @@ class Z3TheoryContext<NullableInt, NullableBool> extends Z3ContextWrapper<IntSor
     private final DatatypeSort<NullableInt> nullableIntSort;
     private final DatatypeSort<NullableBool> nullableBoolSort;
 
-    private record NullableSortInfo<R>(DatatypeSort<R> sort, Constructor<R> nullCon, Constructor<R> valueCon,
-                                       Expr<DatatypeSort<R>> nullExpr) {
-        public NullableSortInfo(DatatypeSort<R> sort, Constructor<R> nullCon, Constructor<R> valueCon) {
-            this(sort, nullCon, valueCon, nullCon.ConstructorDecl().apply());
+    private record NullableSortInfo<R>(Constructor<R> nullCon, Constructor<R> valueCon, Expr<DatatypeSort<R>> nullExpr) {
+        public NullableSortInfo(Constructor<R> nullCon, Constructor<R> valueCon) {
+            this(nullCon, valueCon, nullCon.ConstructorDecl().apply());
         }
     }
 
@@ -61,8 +60,8 @@ class Z3TheoryContext<NullableInt, NullableBool> extends Z3ContextWrapper<IntSor
         }
 
         nullableSorts = ImmutableMap.of(
-                nullableIntSort, new NullableSortInfo<>(nullableIntSort, intNullCon, intValueCon),
-                nullableBoolSort, new NullableSortInfo<>(nullableBoolSort, boolNullCon, boolValueCon)
+                nullableIntSort, new NullableSortInfo<>(intNullCon, intValueCon),
+                nullableBoolSort, new NullableSortInfo<>(boolNullCon, boolValueCon)
         );
     }
 

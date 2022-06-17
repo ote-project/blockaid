@@ -27,10 +27,13 @@ import edu.berkeley.cs.netsys.privacy_proxy.policy_checker.QueryChecker;
 import edu.berkeley.cs.netsys.privacy_proxy.solver.*;
 import edu.berkeley.cs.netsys.privacy_proxy.sql.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -38,10 +41,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static edu.berkeley.cs.netsys.privacy_proxy.util.Logger.printMessage;
 import static edu.berkeley.cs.netsys.privacy_proxy.util.Logger.printStylizedMessage;
+import static edu.berkeley.cs.netsys.privacy_proxy.util.Options.FORMULA_DIR;
+import static edu.berkeley.cs.netsys.privacy_proxy.util.Options.PRINT_FORMULAS;
 import static edu.berkeley.cs.netsys.privacy_proxy.util.TerminalColor.*;
 
 public class PrivacyConnection implements Connection {
@@ -169,6 +173,7 @@ public class PrivacyConnection implements Connection {
             ));
 
     schema = new SchemaPlusWithKey(schemaPlus, ImmutableMap.copyOf(primaryKeys), foreignKeys, constName2Type);
+    printSchema(schema);
 
     ImmutableList.Builder<Policy> policyListBuilder = new ImmutableList.Builder<>();
     for (String sql : direct_info.getProperty("policy").split("\n")) {
@@ -181,7 +186,7 @@ public class PrivacyConnection implements Connection {
     ArrayList<Dependency> dependencies = new ArrayList<>();
     pks.lines().map(this::parsePk).forEach(dependencies::add);
     fks.lines().map(this::parseFk).forEach(dependencies::add);
-    for (String line : deps.lines().collect(Collectors.toList())) {
+    for (String line : deps.lines().toList()) { // Not using `map` because `parseImp` can throw exceptions.
       dependencies.add(parseImp(line));
     }
 
@@ -193,6 +198,41 @@ public class PrivacyConnection implements Connection {
     );
     current_trace = new QueryTrace();
     queryCount = 0;
+  }
+
+  /**
+   * If the `PRINT_FORMULAS` option is set, prints the schema (i.e., for each table, column names and types) to a text file.
+   * The file name is `schema.txt`, and the format is:
+   *  table_name
+   *  column_name1[tab]column_type1
+   *  column_name2[tab]column_type2
+   *  ...
+   *  [newline]
+   *  ...
+   *
+   * @param rawSchema the schema to print.
+   */
+  private static void printSchema(SchemaPlusWithKey rawSchema) {
+    if (!PRINT_FORMULAS) {
+      return;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    for (String tableName : rawSchema.schema.getTableNames()) {
+      sb.append(tableName).append("\n");
+      for (RelDataTypeField field : rawSchema.getTypeForTable(tableName).getFieldList()) {
+        String fieldName = field.getName();
+        RelDataType dataType = field.getType();
+        sb.append(fieldName).append("\t").append(dataType.getFullTypeString()).append("\n");
+      }
+      sb.append("\n");
+    }
+
+    try {
+      Files.writeString(Paths.get(FORMULA_DIR, "schema.txt"), sb);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private UniqueDependency parsePk(String s) {

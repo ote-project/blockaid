@@ -48,7 +48,7 @@ public abstract class SMTExecutor extends Thread {
 
     protected abstract Status doRunNormal() throws InterruptedException;
 
-    protected abstract Status doRunUnsatCore() throws InterruptedException;
+    protected abstract Status doRunUnsatCore();
 
     protected void setUnsatCore(String[] core) {
         this.core = core;

@@ -8,11 +8,6 @@ import java.util.function.Consumer;
 public class Z3Executor extends ProcessSMTExecutor {
     private static final ImmutableList<String> command = ImmutableList.of("z3", "-smt2", "/dev/stdin");
 
-    // unsat core
-    public Z3Executor(String name, String solver, CountDownLatch latch) {
-        super(name, solver, latch, command, false, true, false, true);
-    }
-
     public Z3Executor(String name, String solver, Consumer<String> signalFunc) {
         super(name, solver, signalFunc, command, false, true, false, true);
     }

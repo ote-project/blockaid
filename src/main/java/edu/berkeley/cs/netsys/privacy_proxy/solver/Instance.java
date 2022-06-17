@@ -14,10 +14,8 @@ public class Instance<C extends Z3ContextWrapper<?, ?, ?, ?>> {
     private final Schema<C> schema;
     private final boolean isBounded;
     private final ImmutableMap<String, Relation<C>> name2Rel;
-    private final ImmutableMap<FuncDecl<BoolSort>, String> funcDecl2RelName;
 
-    Instance(Schema<C> schema, boolean isBounded, ImmutableMap<String, Relation<C>> name2Rel,
-             ImmutableMap<FuncDecl<BoolSort>, String> funcDecl2RelName) {
+    Instance(Schema<C> schema, boolean isBounded, ImmutableMap<String, Relation<C>> name2Rel) {
         if (isBounded) {
             checkArgument(name2Rel.values().stream().allMatch(r -> r instanceof ConcreteRelation<C>));
         }
@@ -25,7 +23,6 @@ public class Instance<C extends Z3ContextWrapper<?, ?, ?, ?>> {
         this.schema = checkNotNull(schema);
         this.isBounded = isBounded;
         this.name2Rel = checkNotNull(name2Rel);
-        this.funcDecl2RelName = funcDecl2RelName;
     }
 
     public boolean isBounded() {
@@ -34,10 +31,6 @@ public class Instance<C extends Z3ContextWrapper<?, ?, ?, ?>> {
 
     public Relation<C> get(String relName) {
         return name2Rel.get(relName);
-    }
-
-    String getRelNameFromFuncDecl(FuncDecl<BoolSort> fd) {
-        return funcDecl2RelName.get(fd);
     }
 
     public Schema<C> getSchema() {
@@ -84,11 +77,11 @@ public class Instance<C extends Z3ContextWrapper<?, ?, ?, ?>> {
         public Instance<C> buildUnbounded() {
             ImmutableList<Expr<?>> dbVars = dbVarsBuilder.build();
             checkState(dbVars.isEmpty(), "unbounded formula shouldn't have dbVars");
-            return new Instance<>(schema, false, name2RelBuilder.build(), funcDecl2RelNameBuilder.build());
+            return new Instance<>(schema, false, name2RelBuilder.build());
         }
 
         public BoundedInstance<C> buildBounded() {
-            return new BoundedInstance<>(schema, name2RelBuilder.build(), funcDecl2RelNameBuilder.build(), dbVarsBuilder.build());
+            return new BoundedInstance<>(schema, name2RelBuilder.build(), dbVarsBuilder.build());
         }
     }
 }

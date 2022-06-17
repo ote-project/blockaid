@@ -28,10 +28,6 @@ public class UnionFind<T> {
     // TODO(zhangwen): type parameter for data?
     private final Object[] data; // Data associated with each equivalence class; null means no data.
 
-    public UnionFind(Stream<T> elements) {
-        this(elements.collect(ImmutableList.toImmutableList()));
-    }
-
     public UnionFind(Collection<T> elements) {
         this.elements = ImmutableList.copyOf(elements);
 
@@ -49,10 +45,6 @@ public class UnionFind<T> {
         }
         this.rank = new int[this.index.size()];
         this.data = new Object[this.index.size()];
-    }
-
-    public ImmutableList<T> getAllElements() {
-        return elements;
     }
 
     public T find(T element) {
