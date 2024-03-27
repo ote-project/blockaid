@@ -10,6 +10,8 @@ public class Options {
     /* Cache compliant queries using decision templates. */
     public static final boolean ENABLE_CACHING = Objects.equals(System.getProperty("blockaid.enable_caching"), "true");
 
+    public static final boolean FAST_NON_COMPLIANCE_CHECK = Objects.equals(System.getProperty("blockaid.fast_non_compliance_check"), "true");
+
     /* Generate decision templates but don't store them. */
     public static final boolean CACHE_NO_RETAIN = Objects.equals(System.getProperty("blockaid.cache_no_retain"), "true");
 

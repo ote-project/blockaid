@@ -389,6 +389,14 @@ public class PrivacyConnection implements Connection {
     return connCheckPolicy(originalSql, parserResult, paramNames, paramValues);
   }
 
+  public boolean checkIndividualQuery(String s) throws SQLException {
+    ParserResult pr = shouldApplyPolicyUnvalidated(s)
+            .orElseThrow(() -> new SQLException("Compliance checking not applicable to query: " + s));
+    boolean isCompliant = connCheckPolicy(s, pr);
+    current_trace.endQueryDiscard();
+    return isCompliant;
+  }
+
   private boolean connCheckPolicy(String originalSql, ParserResult parserResult, List<String> paramNames,
                                   List<Object> paramValues) {
     printStylizedMessage("[" + queryCount + "] " + originalSql + "\t" + paramValues,

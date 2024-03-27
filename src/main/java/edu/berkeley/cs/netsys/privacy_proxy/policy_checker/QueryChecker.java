@@ -20,6 +20,7 @@ import edu.berkeley.cs.netsys.privacy_proxy.sql.SchemaPlusWithKey;
 import edu.berkeley.cs.netsys.privacy_proxy.sql.preprocess.SplitIn;
 import edu.berkeley.cs.netsys.privacy_proxy.util.LogLevel;
 import edu.berkeley.cs.netsys.privacy_proxy.util.Logger;
+import edu.berkeley.cs.netsys.privacy_proxy.util.Options;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,8 +55,9 @@ public class QueryChecker {
     }
 
     private final SchemaPlusWithKey rawSchema;
-    private final List<Policy> policySet;
+    private final ImmutableList<Policy> policySet;
 
+    private final Schema<Z3ContextWrapper<?, ?, ?, ?>> boundedSchema;
     private final ImmutableList<Schema<?>> allSchemata;
 
     private final SMTPortfolioRunner runner;
@@ -141,7 +143,7 @@ public class QueryChecker {
                 Sets.immutableEnumSet(ContextOption.DO_SIMPLIFY)
         );
         Schema<Z3CustomSortsContext> customSortsSchema = new Schema<>(unboundedContext, rawSchema, dependencies);
-        Schema<?> theorySchema = new Schema<>(
+        Schema<Z3ContextWrapper<?, ?, ?, ?>> theorySchema = new Schema<>(
                 switch (BOUNDED_FORMULA_TYPE) {
                     case THEORY -> Z3ContextWrapper.makeTheoryContext();
                     case CUSTOM_SORTS -> Z3ContextWrapper.makeCustomSortsContext(
@@ -149,6 +151,7 @@ public class QueryChecker {
                     );
                 },
                 rawSchema, dependencies);
+        this.boundedSchema = theorySchema;
         this.allSchemata = ImmutableList.of(customSortsSchema, theorySchema);
 
         this.runner = new SMTPortfolioRunner(this, SOLVE_TIMEOUT_MS);
@@ -222,13 +225,18 @@ public class QueryChecker {
     }
 
     private boolean doCheckPolicy(UnmodifiableLinearQueryTrace queries) {
-//        BoundEstimator boundEstimator = new UnsatCoreBoundEstimator(new CountingBoundEstimator());
-//        Map<String, Integer> bounds = boundEstimator.calculateBounds(schema, queries);
-//        Map<String, Integer> slackBounds = Maps.transformValues(bounds, n -> n + 2);
-//        BoundedDeterminacyFormula bdf = new BoundedDeterminacyFormula(schema, policyQueries, slackBounds,
-//                false, DeterminacyFormula.TextOption.NO_TEXT, queries.computeKnownRows(schema));
-//        Solver solver = schema.getContext().mkSolver();
-//        return solver.check(Iterables.toArray(bdf.makeCompleteFormula(queries), BoolExpr.class)) == Status.UNSATISFIABLE;
+        if (FAST_NON_COMPLIANCE_CHECK) { // TODO(zhangwen): this is unoptimized.
+            Map<String, Integer> bounds = new UnsatCoreBoundEstimator<>(new CountingBoundEstimator<>())
+                    .calculateBounds(boundedSchema, queries);
+            bounds = Maps.transformValues(bounds, v -> v + 1); // Add some slack.
+
+            BoundedDeterminacyFormula<Z3ContextWrapper<?, ?, ?, ?>> bdf =
+                    new BoundedDeterminacyFormula<>(boundedSchema, policySet, bounds, true);
+            Solver solver = boundedSchema.getContext().mkSolver();
+            solver.add(Iterables.toArray(bdf.makePreambleFormula(), BoolExpr.class));
+            solver.add(Iterables.toArray(bdf.makeBodyFormula(queries), BoolExpr.class));
+            if (solver.check() == Status.SATISFIABLE) return false;
+        }
 
         // fast check
         long startTime = System.currentTimeMillis();

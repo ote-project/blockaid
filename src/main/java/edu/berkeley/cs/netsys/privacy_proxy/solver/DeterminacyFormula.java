@@ -140,6 +140,10 @@ public class DeterminacyFormula<C extends Z3ContextWrapper<?, ?, ?, ?>, I extend
         ));
     }
 
+    public Iterable<BoolExpr> makePreambleFormula() {
+        return Iterables.concat(preamble.values());
+    }
+
     public Iterable<BoolExpr> makeBodyFormula(UnmodifiableLinearQueryTrace queries) {
         return Iterables.concat(
                 generateTupleCheck(queries),
