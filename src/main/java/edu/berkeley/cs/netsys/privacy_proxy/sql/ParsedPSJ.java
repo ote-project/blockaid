@@ -269,7 +269,7 @@ public class ParsedPSJ {
                 addTheta((SqlBasicCall) operand, info);
             } else if (operand instanceof SqlIdentifier) {
                 String name = quantifyName((SqlIdentifier) operand);
-                if (!name.startsWith("!")) {
+                if (!name.startsWith("$")) {
                     info.columns.add(name);
                 }
             } else if (operand instanceof SqlDynamicParam) {
@@ -286,7 +286,7 @@ public class ParsedPSJ {
             String name = quantifyName(identifier);
             if (symbolMap.containsKey(name)) {
                 return symbolMap.get(name);
-            } else if (!name.startsWith("!")) {
+            } else if (!name.startsWith("$")) {
                 String[] parts = name.split("\\.", 2);
                 checkArgument(parts.length == 2, "not a two-part name: %s", name);
                 String relationName = getRelationNameForAlias(parts[0]);
@@ -352,9 +352,9 @@ public class ParsedPSJ {
         } else if (theta instanceof SqlDynamicParam) {
             Object param = params.get(params.size() - 1);
             params.remove(params.size() - 1);
-            String name = "!" + paramNames.get(paramNames.size() - 1);
+            String name = "$" + paramNames.get(paramNames.size() - 1);
             paramNames.remove(paramNames.size() - 1);
-            if (name.equals("!?")) {
+            if (name.equals("$?")) {
                 if (param == null) {
                     throw new UnsupportedOperationException("null parameter is not supported (yet)");
                 }
@@ -374,7 +374,7 @@ public class ParsedPSJ {
         List<String> names = identifier.names;
         if (names.size() == 1) {
             if (names.get(0).startsWith("_")) {
-                return "!" + names.get(0);
+                return "$" + names.get(0);
             }
             if (relations.size() != 1) {
                 throw new UnsupportedOperationException("joins must only use fully-specified column names");
@@ -414,7 +414,7 @@ public class ParsedPSJ {
             if (prefix != null) {
                 for (int i = 0; i < names.size(); ++i) {
                     if (names.get(i).equals("?")) {
-                        names.set(i, prefix + "!" + (i + parameterOffset));
+                        names.set(i, prefix + "$" + (i + parameterOffset));
                     }
                 }
             }

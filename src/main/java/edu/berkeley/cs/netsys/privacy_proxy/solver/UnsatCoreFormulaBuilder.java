@@ -183,7 +183,7 @@ public class UnsatCoreFormulaBuilder<C extends Z3ContextWrapper<?, ?, ?, ?>, I e
             for (int paramIdx = 0; paramIdx < numParams; ++paramIdx) {
                 Expr<?> paramExpr = context.mkConst(
                         // TODO(zhangwen): this naming scheme has to match that in `ParsedPSJ`, which is error-prone.
-                        "!" + qPrefix + "!" + paramIdx,
+                        "$" + qPrefix + "$" + paramIdx,
                         context.getSortForValue(paramValues.get(paramIdx)));
                 Object v = paramValues.get(paramIdx);
                 checkState(!expr2Operand.containsKey(paramExpr));
@@ -202,7 +202,7 @@ public class UnsatCoreFormulaBuilder<C extends Z3ContextWrapper<?, ?, ?, ?>, I e
 
             for (int rowIdx = 0; rowIdx < rows.size(); ++rowIdx) {
                 List<Object> tuple = rows.get(rowIdx);
-                String tupPrefix = "!" + qPrefix + "_tup" + rowIdx;
+                String tupPrefix = "$" + qPrefix + "_tup" + rowIdx;
 
                 Tuple<C> head = q.makeHead(colIdx -> tupPrefix + "_col" + colIdx);
                 for (int attrIdx = 0; attrIdx < tuple.size(); ++attrIdx) {
@@ -233,7 +233,7 @@ public class UnsatCoreFormulaBuilder<C extends Z3ContextWrapper<?, ?, ?, ?>, I e
             // TODO(zhangwen): should put const naming scheme in one place.
             String name = e.getKey();
             Object value = e.getValue();
-            Expr<?> constExpr = context.mkConst("!" + name, context.getSortForValue(value));
+            Expr<?> constExpr = context.mkConst("$" + name, context.getSortForValue(value));
             expr2Operand.put(constExpr, new ContextConstantOperand(name));
             ecs.put(Z3ContextWrapper.normalizeValue(value), constExpr);
         }

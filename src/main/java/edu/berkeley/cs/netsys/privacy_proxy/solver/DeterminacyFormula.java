@@ -113,7 +113,7 @@ public class DeterminacyFormula<C extends Z3ContextWrapper<?, ?, ?, ?>, I extend
         for (Map.Entry<String, Object> entry : queries.getConstMap().entrySet()) {
             Object value = entry.getValue();
             exprs.add(context.mkIsSameValue(
-                    context.mkConst("!" + entry.getKey(), context.getSortForValue(value)),
+                    context.mkConst("$" + entry.getKey(), context.getSortForValue(value)),
                     context.getExprForValue(entry.getValue())
             ));
         }

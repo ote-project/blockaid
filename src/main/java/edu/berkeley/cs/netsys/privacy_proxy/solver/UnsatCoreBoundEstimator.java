@@ -56,7 +56,7 @@ public class UnsatCoreBoundEstimator<C extends Z3ContextWrapper<?, ?, ?, ?>> ext
             Map<BoolExpr, Dependency> dependencyLabels = new HashMap<>();
             int i = 0;
             for (Dependency d : schema.getDependencies()) {
-                String name = "dependency!" + (i++);
+                String name = "dependency$" + (i++);
                 assertions.add(new NamedBoolExpr(d.apply(instance), name));
                 dependencyLabels.put(context.mkBoolConst(name), d);
             }
@@ -79,7 +79,7 @@ public class UnsatCoreBoundEstimator<C extends Z3ContextWrapper<?, ?, ?, ?>> ext
                     continue;
                 }
 
-                String name = "query!" + (i++);
+                String name = "query$" + (i++);
                 assertions.add(new NamedBoolExpr(r.doesContainExpr(tuples), name));
                 queryLabels.put(context.mkBoolConst(name), query);
             }

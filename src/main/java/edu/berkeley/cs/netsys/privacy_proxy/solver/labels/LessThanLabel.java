@@ -6,7 +6,7 @@ import java.util.List;
 public record LessThanLabel(Operand lhs, Operand rhs) implements Label {
     @Override
     public String toString() {
-        return "LessThanLabel!" + lhs + "!" + rhs;
+        return "LessThanLabel$" + lhs + "$" + rhs;
     }
 
     @Override

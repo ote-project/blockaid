@@ -6,7 +6,7 @@ import java.util.List;
 public record EqualityLabel(Operand lhs, Operand rhs) implements Label {
     @Override
     public String toString() {
-        return "EqualityLabel!" + lhs + "!" + rhs;
+        return "EqualityLabel$" + lhs + "$" + rhs;
     }
 
     @Override

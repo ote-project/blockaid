@@ -86,7 +86,7 @@ public abstract class Z3ContextWrapper<IntegralS extends Sort, RealS extends Sor
     protected <S extends Sort> Expr<S> myMkFreshConst(String s, S sort) {
         int nextId = freshIds.get(freshIds.size() - 1);
         freshIds.set(freshIds.size() - 1, nextId + 1);
-        return rawContext.mkConst(s + "!" + nextId, sort);
+        return rawContext.mkConst(s + "$" + nextId, sort);
     }
 
     public abstract BoolExpr mkBoolConst(String s);

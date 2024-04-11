@@ -62,12 +62,12 @@ class CustomSorts {
         Context rawContext = context.rawContext;
         this.quantifierFree = quantifierFree;
 
-        intSort = rawContext.mkUninterpretedSort("CS!INT");
-        dateSort = rawContext.mkUninterpretedSort("CS!DATE");
-        tsSort = rawContext.mkUninterpretedSort("CS!TS");
-        boolSort = rawContext.mkUninterpretedSort("CS!BOOL");
-        realSort = rawContext.mkUninterpretedSort("CS!REAL");
-        stringSort = rawContext.mkUninterpretedSort("CS!STRING");
+        intSort = rawContext.mkUninterpretedSort("CS$INT");
+        dateSort = rawContext.mkUninterpretedSort("CS$DATE");
+        tsSort = rawContext.mkUninterpretedSort("CS$TS");
+        boolSort = rawContext.mkUninterpretedSort("CS$BOOL");
+        realSort = rawContext.mkUninterpretedSort("CS$REAL");
+        stringSort = rawContext.mkUninterpretedSort("CS$STRING");
         ImmutableList<UninterpretedSort> allSorts = ImmutableList.of(intSort, dateSort, tsSort, boolSort, realSort, stringSort);
 
         sortDeclarationSMT = allSorts.stream()
@@ -80,7 +80,7 @@ class CustomSorts {
         // We make a less-than function for every sort, even though some of them might not be comparable (?)
         sort2LtFunc = allSorts.stream().collect(ImmutableMap.toImmutableMap(
                 sort -> sort, // key
-                sort -> context.mkFuncDecl("lt!" + sort.getSExpr(),
+                sort -> context.mkFuncDecl("lt$" + sort.getSExpr(),
                         new Sort[]{sort, sort}, context.rawContext.getBoolSort()) // value
         ));
 
@@ -143,7 +143,7 @@ class CustomSorts {
                 return e;
             }
         }
-        Expr<UninterpretedSort> c = value == null ? context.mkFreshConst(sort.getSExpr() + "!null", sort)
+        Expr<UninterpretedSort> c = value == null ? context.mkFreshConst(sort.getSExpr() + "$null", sort)
                 : context.mkFreshConst(sort.getSExpr(), sort);
         Values vs = valuesStack.get(valuesStack.size() - 1);
         valueMapPicker.apply(vs).put(value, c);
