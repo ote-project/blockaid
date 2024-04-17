@@ -228,11 +228,14 @@ public class QueryChecker {
         if (FAST_NON_COMPLIANCE_CHECK) { // TODO(zhangwen): this is unoptimized.
             Map<String, Integer> bounds = new UnsatCoreBoundEstimator<>(new CountingBoundEstimator<>())
                     .calculateBounds(boundedSchema, queries);
-            bounds = Maps.transformValues(bounds, v -> v + 1); // Add some slack.
+            bounds = Maps.transformValues(bounds, v -> v + 2); // Add some slack.
 
             BoundedDeterminacyFormula<Z3ContextWrapper<?, ?, ?, ?>> bdf =
                     new BoundedDeterminacyFormula<>(boundedSchema, policySet, bounds, true);
             Solver solver = boundedSchema.getContext().mkSolver();
+            Params p = boundedSchema.getContext().mkParams();
+            p.add("timeout", SOLVE_TIMEOUT_MS);
+            solver.setParameters(p);
             solver.add(Iterables.toArray(bdf.makePreambleFormula(), BoolExpr.class));
             solver.add(Iterables.toArray(bdf.makeBodyFormula(queries), BoolExpr.class));
             if (solver.check() == Status.SATISFIABLE) return false;
