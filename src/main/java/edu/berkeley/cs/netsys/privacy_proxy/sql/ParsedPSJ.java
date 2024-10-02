@@ -111,12 +111,10 @@ public class ParsedPSJ {
 
             if (identifier.names.get(identifier.names.size() - 1).equals("")) {
                 if (identifier.names.size() == 1) { // SELECT * FROM ...
-                    if (hasRelAlias) {
-                        throw new RuntimeException("not supported: relation alias");
-                    }
-                    for (String relation : relations) {
-                        schema.getColumnNames(relation).forEach(col -> addProjectColumn((relation + "." + col).toUpperCase()));
-                    }
+                    relAliasToIdx.forEach((alias, relIdx) -> {
+                        String relation = relations.get(relIdx);
+                        schema.getColumnNames(relation).forEach(col -> addProjectColumn((alias + "." + col).toUpperCase()));
+                    });
                 } else { // SELECT table.* FROM ...
                     String quantifier = identifier.names.get(identifier.names.size() - 2).toUpperCase();
                     String relation = relations.get(relAliasToIdx.get(quantifier));
