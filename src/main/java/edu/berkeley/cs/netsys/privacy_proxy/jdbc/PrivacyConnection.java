@@ -258,7 +258,7 @@ public class PrivacyConnection implements Connection {
     try {
       return unvalidatedParserResults.get(s);
     } catch (ExecutionException e) {
-      throw new SQLException(e.getCause());
+      throw new SQLException("Error parsing query (unvalidated): " + s + "\n" + e.getCause());
     }
   }
 

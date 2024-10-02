@@ -39,6 +39,7 @@ public class CheckQuery {
             }
         } catch (SQLException e) {
             System.err.println("Failed to connect: " + e);
+            e.printStackTrace();
         }
 
         // Some thread is not quitting, so we force exit.
