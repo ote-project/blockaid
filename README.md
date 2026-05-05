@@ -45,3 +45,16 @@ To check query compliance, Blockaid invokes SMT solver binaries:
 `z3` ([Z3](https://github.com/Z3Prover/z3) v4.8.12), `cvc5` ([cvc5](https://cvc5.github.io/) v0.3), and `vampire` ([Vampire](https://vprover.github.io/) v4.6.1).
 You should download the binaries and place them in a directory in the `PATH` environment/system variable.
 
+## Changes in This Branch (`standalone-checking`)
+
+This branch adds a standalone query-checking CLI that lets you check individual SQL queries for policy compliance without embedding Blockaid as a JDBC driver.  Run it with:
+
+```
+$ mvn exec:java -Dexec.mainClass="edu.berkeley.cs.netsys.privacy_proxy.cmdline.CheckQuery" \
+    -Dexec.args="jdbc:privacy:thin:<policy_dir>,<jdbc_url>,<database> <username> <password>"
+```
+
+where `<policy_dir>` is the policy directory, `<jdbc_url>` is the underlying JDBC URL (e.g., `jdbc:mysql://localhost`), and `<database>` is the database name.
+
+It reads queries interactively one at a time and prints whether each is compliant.
+
